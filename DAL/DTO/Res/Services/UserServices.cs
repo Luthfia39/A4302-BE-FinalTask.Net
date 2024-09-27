@@ -50,7 +50,7 @@ namespace DAL.DTO.Res.Services
         public async Task<List<ResUserDto>> GetAllUsers()
         {
             return await _context.MstUsers
-                .Where(user => user.Role == "Lender" || user.Role == "Borrower")
+                .Where(user => user.Role != "Admin")
                 .Select(user => new ResUserDto
                 {
                     Id = user.Id,
@@ -105,6 +105,7 @@ namespace DAL.DTO.Res.Services
             var loginResponse = new ResLoginDto
             {
                 Token = token,
+                Role = user.Role
             };
             return loginResponse;
         }
@@ -144,27 +145,24 @@ namespace DAL.DTO.Res.Services
         }
 
 
-        public async Task<ResUserDto> UpdateUser(string id, ReqUpdateUserDto updateDto, bool isAdmin)
+        public async Task<ResUserDto> UpdateUser(string id, ReqUpdateUserDto updateDto)
         {
             var user = await _context.MstUsers.FindAsync(id);
             if (user == null)
                 throw new Exception("User not found");
 
-            // Update name for all users
+            // Update user properties
             if (!string.IsNullOrEmpty(updateDto.Name))
                 user.Name = updateDto.Name;
 
-            // Only admin can update role and balance
-            if (isAdmin)
-            {
-                if (!string.IsNullOrEmpty(updateDto.Role))
-                    user.Role = updateDto.Role;
+            if (!string.IsNullOrEmpty(updateDto.Role))
+                user.Role = updateDto.Role;
 
-                if (updateDto.Balance != 0) // Assuming 0 means no change
-                    user.Balance = updateDto.Balance;
-            }
+            if (updateDto.Balance != 0) // Assuming 0 means no change
+                user.Balance = updateDto.Balance;
 
             await _context.SaveChangesAsync();
+
             return new ResUserDto
             {
                 Id = user.Id,
@@ -175,6 +173,19 @@ namespace DAL.DTO.Res.Services
             };
         }
 
+        public async Task<ResUserByIdDto> GetUserById(string id)
+        {
+            var user = await _context.MstUsers.FindAsync(id);
+            if (user == null)
+                throw new Exception("User not found");
+            return new ResUserByIdDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Role = user.Role,
+                Balance = user.Balance
+            };
+        }
     }
 
 }

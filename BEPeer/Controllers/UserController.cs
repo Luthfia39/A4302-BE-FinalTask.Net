@@ -1,5 +1,6 @@
 ﻿using DAL.DTO.Req;
 using DAL.DTO.Res;
+using DAL.DTO.Res.Services;
 using DAL.DTO.Res.Services.Interfaces;
 using DAL.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -87,7 +88,7 @@ namespace BEPeer.Controllers
                 return Ok(new ResBaseDto<List<ResUserDto>>
                 {
                     Success = true,
-                    Message = "List pf users",
+                    Message = "List of users",
                     Data = users,
                 });
             }
@@ -201,7 +202,7 @@ namespace BEPeer.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin")]
+        //[Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             try
@@ -234,20 +235,12 @@ namespace BEPeer.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> UpdateUser([FromRoute] string id, [FromBody] ReqUpdateUserDto updateDto)
         {
             try
             {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-
-                bool isAdmin = userRole == "admin";
-
-                if (!isAdmin && userId != id)
-                    return Forbid();
-
-                var updatedUser = await _userServices.UpdateUser(id, updateDto, isAdmin);
+                var updatedUser = await _userServices.UpdateUser(id, updateDto);
                 return Ok(new ResBaseDto<ResUserDto>
                 {
                     Success = true,
@@ -258,6 +251,31 @@ namespace BEPeer.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new ResBaseDto<object>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserById(string id)
+        {
+            try
+            {
+                var users = await _userServices.GetUserById(id);
+
+                return Ok(new ResBaseDto<ResUserByIdDto>
+                {
+                    Success = true,
+                    Message = "Succesfully get user by id!",
+                    Data = users,
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResBaseDto<ResUserByIdDto>
                 {
                     Success = false,
                     Message = ex.Message,

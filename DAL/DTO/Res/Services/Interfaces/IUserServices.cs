@@ -17,7 +17,10 @@ namespace DAL.DTO.Res.Services.Interfaces
 
         Task<String> AddUser(ReqRegisterUserDto addUser);
 
-        Task<ResUserDto> UpdateUser(string id, ReqUpdateUserDto updateDto, bool isAdmin);
+        Task<ResUserDto> UpdateUser(string id, ReqUpdateUserDto updateDto);
+
         Task<bool> DeleteUser(string id);
+
+        Task<ResUserByIdDto> GetUserById(string id);
     }
 }
