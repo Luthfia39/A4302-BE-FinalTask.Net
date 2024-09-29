@@ -136,6 +136,39 @@ namespace DAL.Migrations
                     b.ToTable("trn_funding");
                 });
 
+            modelBuilder.Entity("DAL.Models.TrnMonthlyRepayment", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric")
+                        .HasColumnName("amount");
+
+                    b.Property<string>("LoanId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("loan_id");
+
+                    b.Property<string>("Month")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("month");
+
+                    b.Property<DateTime>("PaidAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("paid_at");
+
+                    b.Property<string>("Year")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("year");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("trn_monthly_repayment");
+                });
+
             modelBuilder.Entity("DAL.Models.TrnRepayment", b =>
                 {
                     b.Property<string>("Id")

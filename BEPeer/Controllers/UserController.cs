@@ -283,5 +283,30 @@ namespace BEPeer.Controllers
                 });
             }
         }
+
+        [HttpPut("{id}")]
+        //[Authorize]
+        public async Task<IActionResult> UpdateBalance([FromRoute] string id, [FromBody] ReqUpdateBalanceDto updateBalanceDto)
+        {
+            try
+            {
+                var updatedBalance = await _userServices.UpdateBalance(id, updateBalanceDto);
+                return Ok(new ResBaseDto<ResUpdateBalanceDto>
+                {
+                    Success = true,
+                    Message = "User updated successfully",
+                    Data = updatedBalance
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ResBaseDto<object>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace DAL.DTO.Req
         public decimal InterestRate { get; set; }
 
         [Required(ErrorMessage = "Duration is required")]
-        public int Duration { get; set; }
+        public int Duration { get; set; } = 12;
 
 
     }

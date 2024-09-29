@@ -22,5 +22,6 @@ namespace DAL.DTO.Res.Services.Interfaces
         Task<bool> DeleteUser(string id);
 
         Task<ResUserByIdDto> GetUserById(string id);
+        Task<ResUpdateBalanceDto> UpdateBalance(string id, ReqUpdateBalanceDto newBalance);
     }
 }

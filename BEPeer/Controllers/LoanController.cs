@@ -1,10 +1,8 @@
 ﻿using DAL.DTO.Req;
-using DAL.DTO.Res.Services;
 using DAL.DTO.Res;
+using DAL.DTO.Res.Services;
 using DAL.DTO.Res.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Win32;
 using System.Text;
 
 namespace BEPeer.Controllers
@@ -21,7 +19,7 @@ namespace BEPeer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> NewLoan(ReqLoanDto loan)
+        public async Task<IActionResult> AddNewLoan(ReqLoanDto loan)
         {
             try
             {
@@ -129,7 +127,7 @@ namespace BEPeer.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> LoanList(string status)
+        public async Task<IActionResult> GetAllLoans(string status)
         {
             try
             {
@@ -151,5 +149,98 @@ namespace BEPeer.Controllers
                 });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetLoansByBorrowerId(string borrowerId)
+        {
+            try
+            {
+                var res = await _loanServices.GetLoansByBorrowerId(borrowerId);
+                return Ok(new ResBaseDto<object>
+                {
+                    Success = true,
+                    Message = "Success load loan!",
+                    Data = res
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResBaseDto<string>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetLoanById(string id)
+        {
+            try
+            {
+                var res = await _loanServices.GetLoansById(id);
+                return Ok(new ResBaseDto<object>
+                {
+                    Success = true,
+                    Message = "Success load loan!",
+                    Data = res
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResBaseDto<string>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProcessLoanPayment(string loanId, decimal amountOfPayment)
+        {
+            if (string.IsNullOrEmpty(loanId))
+            {
+                return BadRequest(new ResBaseDto<string>
+                {
+                    Success = false,
+                    Message = "Loan ID tidak boleh kosong.",
+                    Data = null
+                });
+            }
+
+            if (amountOfPayment <= 0)
+            {
+                return BadRequest(new ResBaseDto<string>
+                {
+                    Success = false,
+                    Message = "Jumlah pembayaran harus lebih besar dari nol.",
+                    Data = null
+                });
+            }
+
+            try
+            {
+                var res = await _loanServices.ProcessPayment(loanId, amountOfPayment);
+                return Ok(new ResBaseDto<object>
+                {
+                    Success = true,
+                    Message = "Success process the payment!",
+                    Data = res
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResBaseDto<string>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
+
     }
 }

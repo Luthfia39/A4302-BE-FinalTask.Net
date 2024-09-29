@@ -20,6 +20,7 @@ public partial class PeerLendingContext : DbContext
     public virtual DbSet<MstLoans> MstLoans { get; set; }
     public virtual DbSet<TrnFunding> TrnFundings { get; set; }
     public virtual DbSet<TrnRepayment> TrnRepayment { get; set; }
+    public virtual DbSet<TrnMonthlyRepayment> TrnMonthlyRepayment { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -78,6 +78,9 @@ builder.Services.AddDbContext<PeerLendingContext>(options =>
 
 builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<ILoanServices, LoanServices>();
+builder.Services.AddScoped<IFundingServices, FundingServices>();
+builder.Services.AddScoped<IRepaymentServices, RepaymentServices>();
+builder.Services.AddScoped<IMonthlyPaymentServices, MonthlyPaymentServices>();
 
 var app = builder.Build();
 

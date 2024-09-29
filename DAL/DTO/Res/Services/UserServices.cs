@@ -105,7 +105,8 @@ namespace DAL.DTO.Res.Services
             var loginResponse = new ResLoginDto
             {
                 Token = token,
-                Role = user.Role
+                Role = user.Role,
+                Id = user.Id,
             };
             return loginResponse;
         }
@@ -184,6 +185,23 @@ namespace DAL.DTO.Res.Services
                 Name = user.Name,
                 Role = user.Role,
                 Balance = user.Balance
+            };
+        }
+
+        public async Task<ResUpdateBalanceDto> UpdateBalance(string id, ReqUpdateBalanceDto newBalance)
+        {
+            var user = await _context.MstUsers.FindAsync(id);
+            if (user == null)
+                throw new Exception("User not found");
+
+            if (newBalance.Balance != 0) // Assuming 0 means no change
+                user.Balance = newBalance.Balance;
+            
+            await _context.SaveChangesAsync();
+
+            return new ResUpdateBalanceDto
+            {
+                balance = (decimal)user.Balance
             };
         }
     }
