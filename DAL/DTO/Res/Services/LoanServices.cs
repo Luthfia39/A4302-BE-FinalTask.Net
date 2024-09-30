@@ -62,29 +62,19 @@ namespace DAL.DTO.Res.Services
 
             if (data == null)
                 throw new Exception("Data not found");
-            return
-                    new ResLoanDto
-                    {
-                        BorrowId = data.BorrowId,
-                        BalanceBorrower = Convert.ToDecimal(data.User.Balance),
-                        Amount = data.Amount,
-                        InterestRate = data.InterestRate,
-                        Duration = data.Duration,
-                        Status = data.Status,
-                        CreatedAt = data.CreatedAt,
-                        UpdatedAt = data.UpdatedAt
-                    };
-            //new MstLoans
-            //    {
-            //        Id = data.Id,
-            //        BorrowId = data.BorrowId,
-            //        Amount = data.Amount,
-            //        InterestRate = data.InterestRate,
-            //        Duration = data.Duration,
-            //        Status = data.Status,
-            //        CreatedAt = data.CreatedAt,
-            //        UpdatedAt = data.UpdatedAt
-            //    };
+
+            return new ResLoanDto
+            {
+                Id = data.Id,
+                BorrowId = data.BorrowId,
+                BalanceBorrower = Convert.ToDecimal(data.User.Balance),
+                Amount = data.Amount,
+                InterestRate = data.InterestRate,
+                Duration = data.Duration,
+                Status = data.Status,
+                CreatedAt = data.CreatedAt,
+                UpdatedAt = data.UpdatedAt
+            };
         }
 
         public async Task<List<ResListLoanDto>> LoanList(string status)
@@ -105,6 +95,20 @@ namespace DAL.DTO.Res.Services
                 UpdatedAt = loan.UpdatedAt,
             }).ToListAsync();
             return loans;
+        }
+
+        public async Task<String> UpdateLoan(string id, ReqUpdateLoanDto updateLoan)
+        {
+            var data = await _peerLendingContext.MstLoans.FindAsync(id);
+            if (data != null)
+            {
+                data.Status = updateLoan.Status;
+                data.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await _peerLendingContext.SaveChangesAsync();
+
+            return data.Status;
         }
 
         public async Task<string> ProcessPayment(string loanId, decimal amountOfPayment)
@@ -157,6 +161,11 @@ namespace DAL.DTO.Res.Services
             {
                 Console.WriteLine("pinjaman lunas");
                 await _repaymentServices.UpdateStatusRepayment(paymentData.Id);
+
+                await UpdateLoan(loanId, new ReqUpdateLoanDto
+                {
+                    Status = "repaid"
+                });
             } 
             else if (paymentData.Amount == paymentData.RepaidAmount + amountOfPayment)
             {
@@ -181,6 +190,11 @@ namespace DAL.DTO.Res.Services
 
                 Console.WriteLine("pinjaman lunas");
                 await _repaymentServices.UpdateStatusRepayment(paymentData.Id);
+
+                await UpdateLoan(loanId, new ReqUpdateLoanDto
+                {
+                    Status = "repaid"
+                });
             }
             else
             {
@@ -211,20 +225,5 @@ namespace DAL.DTO.Res.Services
             return "Success";
         }
 
-
-
-        public async Task<String> UpdateLoan(string id, ReqUpdateLoanDto updateLoan)
-        {
-            var data = await _peerLendingContext.MstLoans.FindAsync(id);
-            if (data != null)
-            {
-                data.Status = updateLoan.Status;
-                data.UpdatedAt = DateTime.UtcNow;
-            }
-
-            await _peerLendingContext.SaveChangesAsync();
-
-            return data.Status;
-        }
     }
 }
